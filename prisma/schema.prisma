@@ -13,19 +13,62 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User{
+
+model user{
   id Int @id @default(autoincrement())
-  name String
+  username String 
   email String @unique
   password String
-  events Image[]
+  Registration Registration[]
+  createdAt DateTime @default(now())
+}
+
+model Event{
+  id Int @id @default(autoincrement())
+  name String
+  description String
+  price Int
+  image String
+  admin Admin @relation(fields: [adminId], references: [id])
+  adminId Int
+  Registration Registration[]
+  createdAt DateTime @default(now())
+}
+
+model Registration{
+  id Int @id @default(autoincrement())
+  eventId Int
+  userId Int
   netvotes Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  razorpay_payment_id String
+  razorpay_order_id String
+  razorpay_signature String
+  payment_status String
+  Image Image[]
+  event Event @relation(fields: [eventId], references: [id])
+  user user @relation(fields: [userId], references: [id])
 }
 
 model Image{
   id Int @id @default(autoincrement())
   url String
-  user User @relation(fields: [userId], references: [id])
-  userId Int
+  Registration Registration @relation(fields: [RegistrationId], references: [id])
+  RegistrationId Int
   votes Int
 }
+
+model Admin{
+  id Int @id @default(autoincrement())
+  username String 
+  email String @unique
+  password String
+  Event Event[]
+  createdAt DateTime @default(now())
+}
+
+
+
+
+

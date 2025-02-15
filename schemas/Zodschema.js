@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export const SignupSchema=z.object({
     name:z.string().min(3),
     email:z.string().email(),
@@ -9,3 +11,14 @@ export const LoginSchema=z.object({
     password:z.string().min(6)
 })
 
+export const addEventSchema=z.object({
+    name:z.string().min(3),
+    description:z.string().min(3),
+    price:z.string().min(3),
+    image:z.string().min(3).optional(),
+})
+
+export const registerschema = z.object({
+    eventId: z.number(),
+    userId: z.number(),
+  });

@@ -3,7 +3,9 @@ import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
-
+import eventrouter from "./routes/eventroutes.js";
+import paymentrouter from "./routes/paymentroutes.js";
+import userrouter from "./routes/userroutes.js";
 
 dotenv.config();
 const app=express();
@@ -16,3 +18,10 @@ app.use(rateLimit({
     max:10
 }));
 
+app.use("/api/eveents",eventrouter);
+app.use("/api/payment",paymentrouter);
+app.use("/api/user",userrouter);
+
+app.listen(process.env.PORT,()=>{
+    console.log(`Server running on port ${process.env.PORT}`);
+})
