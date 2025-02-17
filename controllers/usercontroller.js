@@ -74,3 +74,86 @@ export const addadmin=async(req,res)=>{
     }
 }
 
+export const addimage=async(req,res)=>{
+    try{
+        const{userid, images}=req.body;
+
+        const registereduser= Prisma.registration.findUnique({
+            where:{
+                userid:userid
+            }
+        })
+        if(!registereduser){
+            return res.status(404).json({
+                "message":"User not found"
+            })
+        }
+        else{
+            const images = images.map(image=>{
+                 Prisma.image.create({
+                     data:{
+                         image:image,
+                         userid:userid
+                     }
+                 })
+            })
+            
+            if(!images){
+                return res.status(400).json({
+                    "message":"Image not created"
+                })
+            }
+            else{
+                return res.status(200).json({
+                    "message":"Images created successfully!"
+                })
+            }
+        }
+
+    }
+
+    catch(error){
+        console.log(error)
+        return res.status(500).json({
+            "message":"Internal server error"
+        })
+    }
+}
+
+export const vote=async(req,res)=>{
+    try{
+        const {imageid}=req.body;
+
+         
+        const image= Prisma.image.findUnique({
+            where:{
+                id:imageid
+            },
+            data:{
+                votes:image.votes+1
+            }
+           
+        })
+        if(!image){
+            return res.status(404).json({
+                "message":"Image not found"
+            })
+        }
+        else{
+            return res.status(200).json({
+                "message":"Image voted successfully!"
+            })
+        }
+
+    }catch(error){
+        console.log(error)
+        return res.status(500).json({
+            "message":"Internal server error"
+        })
+    }   
+}
+
+
+
+
+
