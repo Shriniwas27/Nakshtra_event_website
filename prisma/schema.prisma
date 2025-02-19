@@ -32,6 +32,8 @@ model Event{
   admin Admin @relation(fields: [adminId], references: [id])
   adminId Int
   Registration Registration[]
+  Images Image[]
+  eventEnded Boolean
   createdAt DateTime @default(now())
 }
 
@@ -40,6 +42,7 @@ model Registration{
   eventId Int
   userId Int
   netvotes Int
+  imagecount Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   razorpay_payment_id String
@@ -54,9 +57,12 @@ model Registration{
 model Image{
   id Int @id @default(autoincrement())
   url String
+  event Event @relation(fields: [eventId], references: [id])
+  eventId Int 
   Registration Registration @relation(fields: [RegistrationId], references: [id])
   RegistrationId Int
   votes Int
+  voterecord String[]
 }
 
 model Admin{

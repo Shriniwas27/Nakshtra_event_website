@@ -1,17 +1,19 @@
 import jwt from "jsonwebtoken";
 
-const auth=async(req,res,next)=>{
-    const token=req.headers.authorization;
-    if(!token){
-        return res.status(401).json({message:"Unauthorized"})
-    }
-    try{
-        const decoded=jwt.verify(token,process.env.JWT_SECRET);
-        req.user=decoded;
-        next();
-    }catch(error){
-        return res.status(401).json({message:"Unauthorized"})
-    }
-}
 
-export default  auth;
+//this is authentication middleware
+const auth = async (req, res, next) => {
+  try {
+    const token = req.headers.authorization;
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.body.userId = decoded;
+    next();
+  } catch (error) {
+    return res.status(500).json({ message: "Authentication Error" });
+  }
+};
+
+export default auth;

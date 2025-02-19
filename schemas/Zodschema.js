@@ -16,6 +16,7 @@ export const addEventSchema=z.object({
     description:z.string().min(3),
     price:z.string().min(3),
     image:z.string().min(3).optional(),
+    adminid:z.string().min(3)
 })
 
 export const registerschema = z.object({

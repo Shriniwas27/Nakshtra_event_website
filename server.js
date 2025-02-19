@@ -18,7 +18,7 @@ app.use(rateLimit({
     max:10
 }));
 
-app.use("/api/eveents",eventrouter);
+app.use("/api/events",eventrouter);
 app.use("/api/payment",paymentrouter);
 app.use("/api/user",userrouter);
 
