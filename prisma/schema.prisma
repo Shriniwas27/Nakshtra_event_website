@@ -61,7 +61,7 @@ model Image{
   eventId Int 
   Registration Registration @relation(fields: [RegistrationId], references: [id])
   RegistrationId Int
-  votes Int
+  votes Int @default(0)
   voterecord String[]
 }
 

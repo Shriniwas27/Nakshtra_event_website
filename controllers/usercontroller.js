@@ -97,10 +97,29 @@ export const addAdmin = async (req, res) => {
 //this controller is used for adding image in web application, all users can add image
 export const addImage = async (req, res) => {
   try {
-    const { userId, images } = req.body;
+    const userId = req.body.userId ? parseInt(req.body.userId, 10) : null;
+    const eventId = req.body.eventId ? parseInt(req.body.eventId, 10) : null;
 
-    const registeredUser = await prisma.registration.findUnique({
-      where: { userid: userId },
+
+    if (!userId || isNaN(userId)) {
+      return res.status(400).json({ message: "User ID is required and must be a number" });
+    }
+
+    if (!eventId || isNaN(eventId)) {
+      return res.status(400).json({ message: "Event ID is required and must be a number" });
+    }
+
+  
+    if (!req.file || !req.file.path) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const imageUrl = req.file.path;
+    console.log("Uploaded Image URL:", imageUrl);
+
+
+    const registeredUser = await Prisma.registration.findUnique({
+      where: { id: userId },
       select: { imagecount: true },
     });
 
@@ -108,37 +127,34 @@ export const addImage = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (registeredUser.imagecount >= 3) {
-      return res
-        .status(400)
-        .json({ message: "You can't add more than 3 images" });
-    }
-
     
-    const image = await prisma.image.create({
-      data: {
-        image: images,
-        userid: userId,
-      },
-    });
-
-    if (!image) {
-      return res.status(400).json({ message: "Image not created" });
+    if (registeredUser.imagecount >= 3) {
+      return res.status(400).json({ message: "You can't add more than 3 images" });
     }
 
-    await prisma.registration.update({
-      where: { userid: userId },
+    const image = await Prisma.image.create({
       data: {
-        imagecount: registeredUser.imagecount + 1,
+        url: imageUrl,
+        eventId: eventId, 
+        RegistrationId: userId, 
       },
     });
 
-    return res.status(200).json({ message: "Image added successfully!" });
+    await Prisma.registration.update({
+      where: { id: userId },
+      data: { imagecount: registeredUser.imagecount + 1 },
+    });
+
+    return res.status(201).json({ message: "Image added successfully!", image });
+
   } catch (error) {
-    console.error("Error adding image:", error);
+    
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
+
 
 //this controller is ued for voting, all users can vote
 export const voteImage = async (req, res) => {
@@ -161,7 +177,7 @@ export const voteImage = async (req, res) => {
         .json({ message: "You have already voted for this image" });
     }
 
-    await prisma.image.update({
+    await Prisma.image.update({
       where: { id: imageId },
       data: {
         votes: image.votes + 1,

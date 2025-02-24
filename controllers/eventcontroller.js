@@ -14,7 +14,8 @@ export const addEvent = async (req, res) => {
               .json({ message: "Invalid data", validation: validation.error });
     }
 
-    const { name, description, price, image } = validation.data;
+    const { name, description, price } = validation.data;
+    const image = req.file.path;
     const event = await Prisma.event.create({
       data: {
         name: name,
@@ -113,52 +114,63 @@ export const getEventById = async (req, res) => {
 //this controller is used to register for event, all users can register for event
 export const registerforEvent = async (req, res) => {
   try {
-    const {eventid} = req.params;
-    const {userId} = req.body;
-    const event = Prisma.event.findUnique({
-      where: {
-        id: eventid,
-      },
+    const { eventId } = req.params;
+    const { userId } = req.body;
+
+  
+    const event = await prisma.event.findUnique({
+      where: { id: eventId },
     });
 
-    const user = Prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-    });
-    
-    const alreadyregistered= await Prisma.findUnique({
-        where:{
-            eventId:event.id,
-            userId:user.id
-        }
-    })
-
-    if(alreadyregistered){
-        return res.status(400).json({
-            message:"User already registered for event"
-        })
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
     }
+
+   
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+   
+    const alreadyRegistered = await prisma.registration.findFirst({
+      where: {
+        eventId: eventId,
+        userId: userId,
+      },
+    });
+
+    if (alreadyRegistered) {
+      return res.status(400).json({ message: "User already registered for event" });
+    }
+
+    
     const order = createOrder(event.price, user, event);
-    const registration = await Prisma.registration.create({
+
+   
+    const registration = await prisma.registration.create({
       data: {
-        eventId: event.id,
-        userId: user.id,
+        eventId: eventId,
+        userId: userId,
         payment_status: "PENDING",
       },
     });
 
-    return res
-      .status(201)
-      .json({
-        message: "Registration created successfully",
-        registration: registration,
-        order: order,
-      });
+    return res.status(201).json({
+      message: "Registration created successfully",
+      registration,
+      order,
+    });
+
   } catch (error) {
+    console.error("Error registering for event:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 
 //this controller is used to prepare leaderboard for event, all user can access leaderboard for event
