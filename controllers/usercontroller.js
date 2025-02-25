@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { SignupSchema, LoginSchema } from "../schemas/Zodschema.js";
 import jwt from "jsonwebtoken";
+import sendMail from "../services/mailservice.js";
 
 const Prisma = new PrismaClient();
 
@@ -152,8 +153,6 @@ export const addImage = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
-
 
 
 //this controller is ued for voting, all users can vote
