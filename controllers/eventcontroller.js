@@ -118,7 +118,7 @@ export const registerforEvent = async (req, res) => {
     const { userId } = req.body;
 
   
-    const event = await prisma.event.findUnique({
+    const event = await Prisma.event.findUnique({
       where: { id: eventId },
     });
 
@@ -136,7 +136,7 @@ export const registerforEvent = async (req, res) => {
     }
 
    
-    const alreadyRegistered = await prisma.registration.findFirst({
+    const alreadyRegistered = await Prisma.registration.findFirst({
       where: {
         eventId: eventId,
         userId: userId,
@@ -151,13 +151,16 @@ export const registerforEvent = async (req, res) => {
     const order = createOrder(event.price, user, event);
 
    
-    const registration = await prisma.registration.create({
+    const registration = await Prisma.registration.create({
       data: {
         eventId: eventId,
         userId: userId,
         payment_status: "PENDING",
       },
     });
+    
+     sendMail = await sendMail(user.email, "Registration Confirmation", `Hi ${user.username}, you have registered for ${event.name} event. Please click on the link below to confirm your registration.`);
+
 
     return res.status(201).json({
       message: "Registration created successfully",

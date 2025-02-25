@@ -1,15 +1,14 @@
 import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";  
-import cloudinary from "./cloudinary.js";
-import dotenv from 'dotenv';
+import { getCloudinaryInstance } from "./cloudinary.js";
+import dotenv from "dotenv";
+
 dotenv.config();
 
-
+// Multer Storage Configuration with dynamic Cloudinary switching
 const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: (req, file) => {
-  
-
+  cloudinary: await getCloudinaryInstance(),
+  params: async (req, file) => {
     return {
       folder: "uploads",
       format: "png",
@@ -19,4 +18,7 @@ const storage = new CloudinaryStorage({
 });
 
 export const upload = multer({ storage });
+
+
+
 
