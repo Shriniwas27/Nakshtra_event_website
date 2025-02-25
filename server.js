@@ -14,8 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true })); 
 app.use(cors());
 app.use(helmet());
-
-
+app.use
 
 app.use("/api/user",userrouter);
 app.use("/api/events",eventrouter);
