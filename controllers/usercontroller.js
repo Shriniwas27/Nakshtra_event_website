@@ -107,7 +107,7 @@ export const addAdmin = async (req, res) => {
         },
       });
       if (!admin) {
-        return res.json({
+        return res.status(400).json({
           message: "Admin not created",
         });
       } else {
