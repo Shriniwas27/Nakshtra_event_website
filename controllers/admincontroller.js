@@ -4,7 +4,7 @@ const Prisma = new PrismaClient();
 
 
 //this controller is used to get all event registrations, only admin can get all event registrations
-export const getalleventregistration = async(req,res)=>{
+export const getAllEventRegistration = async(req,res)=>{
     try{
         const {eventId}=req.params;
         const registrations = await Prisma.registration.findMany({
@@ -23,7 +23,9 @@ export const getalleventregistration = async(req,res)=>{
     }
 }
 
-export const logalltosheet=async(req,res)=>{
+
+//this controller is used to log all enteries to google sheets, only admin can log all enteries
+export const logAlltoSheet=async(req,res)=>{
     try{
         const eventId = req.body.eventId;
         const registrations = await Prisma.registration.findMany({

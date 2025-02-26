@@ -18,6 +18,7 @@ export const createOrder = async (amount, user, event) => {
     };
 
     const order = await razorpay.orders.create(options);
+    console.log("Order created successfully:", order);
     return order;
   } catch (error) {
     console.error("Error creating Razorpay order:", error);
@@ -30,8 +31,8 @@ export const createOrder = async (amount, user, event) => {
 //this controller is used to validate payment and updates registration status
 export const validatePayment = async (req, res) => {
   try {
+   
     const { order_id, payment_id, signature, registration_id } = req.body;
-
   
     const generatedSignature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
@@ -40,11 +41,12 @@ export const validatePayment = async (req, res) => {
 
     if (generatedSignature !== signature) {
      
-      await prisma.order.update({
-        where: { id: order_id },
+      await Prisma.registration.update({
+        where: { id: registration_id},
         data: {
           razorpay_payment_id: payment_id,
           razorpay_order_id: order_id,
+          razorpay_signature: signature,
           payment_status: "FAILED",
         },
       });
@@ -53,7 +55,7 @@ export const validatePayment = async (req, res) => {
     }
 
   
-    const registration = await prisma.registration.findUnique({
+    const registration = await Prisma.registration.findUnique({
       where: { id: registration_id },
     });
 
@@ -62,7 +64,7 @@ export const validatePayment = async (req, res) => {
     }
 
   
-    await prisma.registration.update({
+    await Prisma.registration.update({
       where: { id: registration_id },
       data: {
         razorpay_payment_id: payment_id,

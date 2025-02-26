@@ -10,18 +10,11 @@ const admincheck = async (req, res, next) => {
     if (!token) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const admin = await Prisma.admin.findUnique({
-      where: {
-        id: decoded,
-      },
-    });
-    if (!admin) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-    req.body.adminid = decoded;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_ADMIN);
     next();
   } catch (error) {
     return res.status(500).json({ message: "Authentication Error" });
   }
 };
+
+export default admincheck;

@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { SignupSchema, LoginSchema } from "../schemas/Zodschema.js";
 import jwt from "jsonwebtoken";
-import sendMail from "../services/mailservice.js";
+
 
 const Prisma = new PrismaClient();
 
