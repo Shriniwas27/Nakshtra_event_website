@@ -11,11 +11,11 @@ export const signUp = async (req, res) => {
   try {
     const validation = SignupSchema.safeParse(req.body);
     if (validation.success) {
-      const { name, email, password } = validation.data;
+      const { username, email, password } = validation.data;
       const hashedPassword = await bcrypt.hash(password, 10);
       const user = await Prisma.user.create({
         data: {
-          username: name,
+          username: username,
           email: email,
           password: hashedPassword,
         },
