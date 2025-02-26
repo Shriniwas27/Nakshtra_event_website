@@ -10,9 +10,19 @@ const Prisma = new PrismaClient();
 export const signUp = async (req, res) => {
   try {
     const validation = SignupSchema.safeParse(req.body);
-    if (validation.success) {
+    console.log(validation);
+    if (validation) {
       const { name, email, password } = validation.data;
       const hashedPassword = await bcrypt.hash(password, 10);
+      const  alreadyuser= await Prisma.user.findUnique({
+        where: {
+          email: email,
+        },
+      });
+
+      if(alreadyuser){
+        return res.status(400).json({ message: "User already exists" });
+      }
       const user = await Prisma.user.create({
         data: {
           username: name,
@@ -23,13 +33,11 @@ export const signUp = async (req, res) => {
       res
         .status(200)
         .json({ message: "User created successfully", user: user });
-    } else {
-      res
-        .status(400)
-        .json({ message: "Invalid data", validation: validation.error });
+    }else{
+      return res.status(400).json({ message: "Invalid data" });
     }
   } catch (error) {
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error", error: error });
   }
 };
 
