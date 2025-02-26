@@ -1,4 +1,4 @@
-import transporter from "../config/nodemailerconfig";
+import transporter from "../config/nodemailerconfig.js";
 import dotenv from "dotenv";
 dotenv.config();    
 

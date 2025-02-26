@@ -1,4 +1,4 @@
-import sheets from '../config/googlesheetconfig';
+import sheets from '../config/googlesheetconfig.js';
 import { google } from 'googleapis';
 import dotenv from 'dotenv';
 dotenv.config();
