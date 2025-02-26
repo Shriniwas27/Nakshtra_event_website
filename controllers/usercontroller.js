@@ -30,7 +30,7 @@ export const signUp = async (req, res) => {
     }
   } catch (error) {
     if(error.code === 'P2002'){
-      return res.status(400).json({message:`Unique constraint failed on ${error.meta.target}`},)
+      return res.status(409).json({message:`Unique constraint failed on ${error.meta.target}`},)
     }
     console.error(error);
     return res.status(500).json({ message: "Internal server error" });
@@ -46,9 +46,9 @@ export const login = async (req, res) => {
         .status(400)
         .json({ message: "Invalid data", validation: validation.error });
     }
-    const { email, password ,isadmin } = validation.data;
+    const { email, password ,isAdmin } = validation.data;
 
-    if(isadmin){
+    if(isAdmin){
       const admin = await Prisma.admin.findUnique({
         where: {
           email: email,
@@ -58,7 +58,7 @@ export const login = async (req, res) => {
         return res.status(404).json({ message: "admin not found" });
       }
       if (await bcrypt.compare(password, admin.password)) {
-        const token = jwt.sign({ id: admin.id }, process.env.JWT_SECRET);
+        const token = jwt.sign({ id: admin.id }, process.env.JWT_SECRET_ADMIN);
         return res.status(200).json({ message: "Login successful", token: token });
       } else {
         return res.status(401).json({ message: "Invalid credentials" });
@@ -72,7 +72,7 @@ export const login = async (req, res) => {
         },
       });
       if (!user) {
-        return res.status(404).json({ message: "User not found" });
+        return res.status(404).json({ message: "Invalid credentials" });
       }
       if (await bcrypt.compare(password, user.password)) {
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
