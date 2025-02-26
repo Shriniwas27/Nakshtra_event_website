@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { SignupSchema, LoginSchema } from "../schemas/Zodschema.js";
 import jwt from "jsonwebtoken";
-import sendMail from "../services/mailservice.js";
+
 
 const Prisma = new PrismaClient();
 
@@ -42,20 +42,40 @@ export const login = async (req, res) => {
         .status(400)
         .json({ message: "Invalid data", validation: validation.error });
     }
-    const { email, password } = validation.data;
-    const user = await Prisma.user.findUnique({
-      where: {
-        email: email,
-      },
-    });
-    if (!user) {
-      res.status(404).json({ message: "User not found" });
+    const { email, password ,isadmin } = validation.data;
+
+    if(isadmin){
+      const admin = await Prisma.admin.findUnique({
+        where: {
+          email: email,
+        },
+      });
+      if (!admin) {
+        res.status(404).json({ message: "admin not found" });
+      }
+      if (await bcrypt.compare(password, admin.password)) {
+        const token = jwt.sign({ id: admin.id }, process.env.JWT_SECRET);
+        res.status(200).json({ message: "Login successful", token: token });
+      } else {
+        res.status(401).json({ message: "Invalid credentials" });
+      }
     }
-    if (await bcrypt.compare(password, user.password)) {
-      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
-      res.status(200).json({ message: "Login successful", token: token });
-    } else {
-      res.status(401).json({ message: "Invalid credentials" });
+
+    else{
+      const user = await Prisma.user.findUnique({
+        where: {
+          email: email,
+        },
+      });
+      if (!user) {
+        res.status(404).json({ message: "User not found" });
+      }
+      if (await bcrypt.compare(password, user.password)) {
+        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
+        res.status(200).json({ message: "Login successful", token: token });
+      } else {
+        res.status(401).json({ message: "Invalid credentials" });
+      }
     }
   } catch (error) {
     return res.status(500).json({ message: "Internal server error" });

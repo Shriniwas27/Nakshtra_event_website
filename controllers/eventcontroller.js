@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { addEventSchema } from "../schemas/Zodschema.js";
 import { createOrder } from "./paymentcontroller.js";
-
+import sendMail from "../services/mailservice.js";
 const Prisma = new PrismaClient();
 
 
@@ -135,8 +135,8 @@ export const getEventById = async (req, res) => {
 //this controller is used to register for event, all users can register for event
 export const registerforEvent = async (req, res) => {
   try {
-    const { eventId } = req.params;
-    const { userId } = req.body;
+    const  eventId  = parseInt(req.body.eventId);
+    const  userId  = parseInt(req.body.userId);
 
   
     const event = await Prisma.event.findUnique({
@@ -148,7 +148,7 @@ export const registerforEvent = async (req, res) => {
     }
 
    
-    const user = await prisma.user.findUnique({
+    const user = await Prisma.user.findUnique({
       where: { id: userId },
     });
 
@@ -169,24 +169,33 @@ export const registerforEvent = async (req, res) => {
     }
 
     
-    const order = createOrder(event.price, user, event);
+    let order = await createOrder(event.price, user, event);
 
    
     const registration = await Prisma.registration.create({
       data: {
-        eventId: eventId,
-        userId: userId,
+        event: {
+          connect: { id: eventId }, // Connect existing event
+        },
+        user: {
+          connect: { id: userId }, // Connect existing user
+        },
         payment_status: "PENDING",
+        netvotes: 0,
+        imagecount: 0,
+        razorpay_payment_id: "",
+        razorpay_order_id: "",
+        razorpay_signature: "",
       },
     });
     
-     sendMail = await sendMail(user.email, "Registration Confirmation", `Hi ${user.username}, you have registered for ${event.name} event. Please click on the link below to confirm your registration.`);
+      await sendMail(user.email, "Registration Confirmation", `Hi ${user.username}, you have registered for ${event.name} event. Please click on the link below to confirm your registration.`);
 
 
     return res.status(201).json({
       message: "Registration created successfully",
       registration,
-      order,
+      order:order,
     });
 
   } catch (error) {

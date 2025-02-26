@@ -44,7 +44,6 @@ model Registration{
   netvotes Int
   imagecount Int
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
   razorpay_payment_id String
   razorpay_order_id String
   razorpay_signature String

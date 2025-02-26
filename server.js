@@ -16,7 +16,6 @@ app.use(cors());
 app.use(helmet());
 
 
-
 app.use("/api/user",userrouter);
 app.use("/api/events",eventrouter);
 app.use("/api/payment",paymentrouter);

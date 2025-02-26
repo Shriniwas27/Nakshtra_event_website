@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// Multer Storage Configuration with dynamic Cloudinary switching
+
 const storage = new CloudinaryStorage({
   cloudinary: await getCloudinaryInstance(),
   params: async (req, file) => {

@@ -1,5 +1,5 @@
-import transporter from "../config/nodemailerconfig.js";
-import dotenv from "dotenv";
+import transporter from '../config/nodemailerconfig.js';
+import dotenv from 'dotenv';
 dotenv.config();    
 
 const sendMail = async (to, subject, text) => {
