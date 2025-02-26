@@ -19,6 +19,8 @@ model user{
   username String 
   email String @unique
   password String
+  isverified Boolean @default(false)
+  verificationtoken String?
   Registration Registration[]
   createdAt DateTime @default(now())
 }
@@ -28,7 +30,7 @@ model Event{
   name String
   description String
   price Int
-  image String
+  image String?
   admin Admin @relation(fields: [adminId], references: [id])
   adminId Int
   Registration Registration[]

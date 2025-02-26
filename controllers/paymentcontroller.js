@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { razorpay } from "../config/razorpay.js";
 import crypto from "crypto";
+import sendMail from "../services/mailservice.js";
 
 const Prisma = new PrismaClient();
 
@@ -18,10 +19,10 @@ export const createOrder = async (amount, user, event) => {
     };
 
     const order = await razorpay.orders.create(options);
-    console.log("Order created successfully:", order);
+    
     return order;
   } catch (error) {
-    console.error("Error creating Razorpay order:", error);
+   
     throw new Error("Failed to create order");
   }
 };
@@ -57,6 +58,7 @@ export const validatePayment = async (req, res) => {
   
     const registration = await Prisma.registration.findUnique({
       where: { id: registration_id },
+      include: { event: true, user: true },
     });
 
     if (!registration) {
@@ -73,7 +75,7 @@ export const validatePayment = async (req, res) => {
         payment_status: "PAID",
       },
     });
-
+    sendMail(registration.user.email, "Payment Confirmation", `Hi ${registration.user.username}, your payment for ${registration.event.name} event has been confirmed.`);
     return res.status(200).json({ message: "Payment validated successfully" });
 
   } catch (error) {

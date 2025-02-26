@@ -11,6 +11,7 @@ const admincheck = async (req, res, next) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
     const decoded = jwt.verify(token, process.env.JWT_SECRET_ADMIN);
+    req.body.adminId = decoded.id;
     next();
   } catch (error) {
     return res.status(500).json({ message: "Authentication Error" });

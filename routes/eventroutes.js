@@ -6,14 +6,14 @@ import { upload } from "../config/multerconfig.js";
 
 const router=express.Router();
 
-router.get("/all",auth,getAllEvents);
-router.get("/event/:eventId",auth,getEventById);
+router.get("/all",auth,getAllEvents);//tested
+router.get("/event/:id",auth,getEventById);///tested
 router.post("/event",admincheck,upload.single("image"),addEvent);
 router.delete("/event/:id",admincheck,deleteEventById);
 router.put("/event/:id",admincheck,updateEventById);
-router.get("/leaderboard/:id",auth,prepareLeaderBoardforEvent);
-router.get("/images",auth,getAllImagesforEvent);    
-router.get("/image/:id",auth,getImageById);    
+router.get("/leaderboard/:id",auth,prepareLeaderBoardforEvent);//tested
+router.get("/images",auth,getAllImagesforEvent);  //tested  
+router.get("/image/:id",auth,getImageById);   
 router.post("/register",auth,registerforEvent); 
 
 
