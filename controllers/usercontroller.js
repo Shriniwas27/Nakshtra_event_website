@@ -55,7 +55,7 @@ export const login = async (req, res) => {
         },
       });
       if (!admin) {
-        return res.status(404).json({ message: "admin not found" });
+        return res.status(401).json({ message: "Invalid credentials" });
       }
       if (await bcrypt.compare(password, admin.password)) {
         const token = jwt.sign({ id: admin.id }, process.env.JWT_SECRET_ADMIN);
@@ -72,7 +72,7 @@ export const login = async (req, res) => {
         },
       });
       if (!user) {
-        return res.status(404).json({ message: "Invalid credentials" });
+        return res.status(401).json({ message: "Invalid credentials" });
       }
       if (await bcrypt.compare(password, user.password)) {
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
