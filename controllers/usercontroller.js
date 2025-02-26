@@ -29,6 +29,10 @@ export const signUp = async (req, res) => {
         .json({ message: "Invalid data", validation: validation.error });
     }
   } catch (error) {
+    if(error.code === 'P2002'){
+      return res.status(400).json({message:`Unique constraint failed on ${error.meta.target}`},)
+    }
+    console.error(error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -78,20 +82,15 @@ export const login = async (req, res) => {
       }
     }
   } catch (error) {
+    console.error(error.message);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
 
+
 //this controller is used for adding admin in web application, only admin can add admin
 export const addAdmin = async (req, res) => {
   try {
-    const isAdmin = await Prisma.admin.findUnique({
-      where: { id: req.body.userId },
-    });
-    
-    if (!isAdmin) {
-      return res.status(403).json({ message: "Access denied. Only admins can access this route." });
-    }
     const { email, username, password } = req.body;
     const validation = SignupSchema.safeParse(req.body);
     if (!validation.success) {
@@ -113,7 +112,7 @@ export const addAdmin = async (req, res) => {
         });
       } else {
         return res.status(200).json({
-          Message: "Admin created successfully!",
+          message: "Admin created successfully!"
         });
       }
     }
