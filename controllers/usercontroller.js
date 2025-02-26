@@ -65,6 +65,13 @@ export const login = async (req, res) => {
 //this controller is used for adding admin in web application, only admin can add admin
 export const addAdmin = async (req, res) => {
   try {
+    const isAdmin = await Prisma.admin.findUnique({
+      where: { id: req.body.userId },
+    });
+    
+    if (!isAdmin) {
+      return res.status(403).json({ message: "Access denied. Only admins can access this route." });
+    }
     const { email, username, password } = req.body;
     const validation = SignupSchema.safeParse(req.body);
     if (!validation.success) {
