@@ -38,7 +38,7 @@ export const login = async (req, res) => {
   try {
     const validation = LoginSchema.safeParse(req.body);
     if (!validation.success) {
-      res
+      return res
         .status(400)
         .json({ message: "Invalid data", validation: validation.error });
     }
@@ -51,13 +51,13 @@ export const login = async (req, res) => {
         },
       });
       if (!admin) {
-        res.status(404).json({ message: "admin not found" });
+        return res.status(404).json({ message: "admin not found" });
       }
       if (await bcrypt.compare(password, admin.password)) {
         const token = jwt.sign({ id: admin.id }, process.env.JWT_SECRET);
-        res.status(200).json({ message: "Login successful", token: token });
+        return res.status(200).json({ message: "Login successful", token: token });
       } else {
-        res.status(401).json({ message: "Invalid credentials" });
+        return res.status(401).json({ message: "Invalid credentials" });
       }
     }
 
@@ -68,13 +68,13 @@ export const login = async (req, res) => {
         },
       });
       if (!user) {
-        res.status(404).json({ message: "User not found" });
+        return res.status(404).json({ message: "User not found" });
       }
       if (await bcrypt.compare(password, user.password)) {
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
-        res.status(200).json({ message: "Login successful", token: token });
+        return res.status(200).json({ message: "Login successful", token: token });
       } else {
-        res.status(401).json({ message: "Invalid credentials" });
+        return res.status(401).json({ message: "Invalid credentials" });
       }
     }
   } catch (error) {
