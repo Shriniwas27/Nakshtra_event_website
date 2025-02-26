@@ -9,9 +9,9 @@ const router=express.Router();
 
 router.post("/signup",signUp);
 router.post("/login",login);
-router.post("/addadmin",admincheck,addAdmin);
-router.post("/addimage", auth,upload.single("image"),addImage);
-router.post("/voteimage/:id",auth,voteImage);
+router.post("/addAdmin",admincheck,addAdmin);
+router.post("/addImage", auth,upload.single("image"),addImage);
+router.post("/voteImage/:id",auth,voteImage);
 
 
 export default router;
