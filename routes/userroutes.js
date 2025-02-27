@@ -15,7 +15,7 @@ router.post("/voteimage/:id",voteImage);//tested
 router.get("/verify/:token",auth,verifyuser);
 router.get("/downloadleaderboard/:id",downloadLeaderboard);//tested
 router.post("/sendnotification/:id",sendnotification);
-router.post("/end/:id",endEvent);
+router.post("/end/:id",endEvent);//tested
 router.post("/logtoallsheet/:id",admincheck,logAlltoSheet);
 
 export default router;
