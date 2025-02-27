@@ -18,10 +18,10 @@ const cloudinaryAccounts = [
     api_key: process.env.CLOUDINARY_API_KEY_2,
     api_secret: process.env.CLOUDINARY_API_SECRET_2,
   },
-
+  
 ];
 
-let currentAccountIndex = 0; 
+let currentAccountIndex = 0;; 
 
 
 const checkAccountUsage = async (account) => {
@@ -40,7 +40,11 @@ const checkAccountUsage = async (account) => {
 
     const { storage, credits } = response.data;
 
-    
+    console.log(`Account: ${account.name}`);
+      console.log(`Used storage: ${storage.usage} MB`);
+      console.log(`Storage limit: ${storage.limit} MB`);
+      console.log(`Storage used %: ${(storage.usage / storage.limit) * 100}%`);
+      console.log(`Credits used: ${credits.used_percent}%`);
 
     return credits.used_percent < 90;
   } catch (error) {
@@ -62,8 +66,8 @@ const switchCloudinaryAccount = async () => {
         api_key: account.api_key,
         api_secret: account.api_secret,
       });
+  
 
-    
       currentAccountIndex = accountIndex;
       return cloudinary.v2;
     }

@@ -9,6 +9,7 @@ dotenv.config();
 const storage = new CloudinaryStorage({
   cloudinary: await getCloudinaryInstance(),
   params: async (req, file) => {
+
     return {
       folder: "uploads",
       format: "png",

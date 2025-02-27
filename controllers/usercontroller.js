@@ -79,7 +79,6 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Generate token
     const secret = isadmin ? process.env.JWT_SECRET_ADMIN : process.env.JWT_SECRET_USER;
     const token = jwt.sign({ id: user.id }, secret);
 
@@ -88,7 +87,7 @@ export const login = async (req, res) => {
     console.error("Login Error:", error);
     return res.status(500).json({ message: "Internal server error" });
   } finally {
-    await Prisma.$disconnect(); // Ensure the Prisma connection is closed
+    await Prisma.$disconnect(); 
   }
 };
 
@@ -97,7 +96,7 @@ export const addAdmin = async (req, res) => {
   try {
     const { email, name, password } = req.body;
     const validation = SignupSchema.safeParse(req.body);
-    console.log(validation);
+  
     if (!validation.success) {
       return res.status(400).json({
         message: "Validation Failed!",
@@ -111,7 +110,7 @@ export const addAdmin = async (req, res) => {
           password: hashpassword,
         }
       });
-      console.log(admin);
+  
       if (!admin) {
         return res.json({
           message: "Admin not created",
@@ -130,13 +129,12 @@ export const addAdmin = async (req, res) => {
 //this controller is used for adding image in web application, all users can add image
 export const addImage = async (req, res) => {
   try {
-    const userId = req.body.userId ? parseInt(req.body.userId, 10) : null;
+   
     const eventId = req.body.eventId ? parseInt(req.body.eventId, 10) : null;
+    const registrationId = req.body.registrationId ? parseInt(req.body.registrationId, 10) : null;
+     console.log(req.body);
+     console.log(req.file);
 
-
-    if (!userId || isNaN(userId)) {
-      return res.status(400).json({ message: "User ID is required and must be a number" });
-    }
 
     if (!eventId || isNaN(eventId)) {
       return res.status(400).json({ message: "Event ID is required and must be a number" });
@@ -150,12 +148,13 @@ export const addImage = async (req, res) => {
     const imageUrl = req.file.path;
     console.log("Uploaded Image URL:", imageUrl);
 
-
+    console.log(registrationId);
     const registeredUser = await Prisma.registration.findUnique({
-      where: { id: userId },
-      select: { imagecount: true },
+      where: { id: registrationId },
+      select: { imagecount: true, id: true },
     });
 
+    console.log(registeredUser);
     if (!registeredUser) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -169,15 +168,17 @@ export const addImage = async (req, res) => {
       data: {
         url: imageUrl,
         eventId: eventId, 
-        RegistrationId: userId, 
+        RegistrationId: registrationId,
+        voterecord:[]
       },
     });
 
+    console.log(image);
     await Prisma.registration.update({
-      where: { id: userId },
+      where: { id: registrationId },
       data: { imagecount: registeredUser.imagecount + 1 },
     });
-
+    console.log(registeredUser);
     return res.status(201).json({ message: "Image added successfully!", image });
 
   } catch (error) {
@@ -190,14 +191,14 @@ export const addImage = async (req, res) => {
 //this controller is ued for voting, all users can vote
 export const voteImage = async (req, res) => {
   try {
-    const { imageId } = req.params;
-    const { userId } = req.body;
+    const imageId = parseInt(req.params.id);
+    const userId= req.body.userId;
 
     const image = await Prisma.image.findUnique({
       where: { id: imageId },
       select: { votes: true, voterecord: true },
     });
-
+    console.log(image);
     if (!image) {
       return res.status(404).json({ message: "Image not found" });
     }
@@ -207,14 +208,15 @@ export const voteImage = async (req, res) => {
         .status(400)
         .json({ message: "You have already voted for this image" });
     }
-
+    console.log(image.voterecord.includes(userId));
     await Prisma.image.update({
       where: { id: imageId },
       data: {
         votes: image.votes + 1,
-        voterecord: { push: userId },
+        voterecord: [...image.voterecord, userId],
       },
-    });
+    }).then(console.log(image));
+     
     return res.status(200).json({ message: "Image voted successfully!" });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error" });
@@ -232,7 +234,7 @@ export const verifyuser= async(req,res)=>{
       }
     })
     if(user){
-      user.isverified=true;
+
       await Prisma.user.update({
         where:{
           id:user.id

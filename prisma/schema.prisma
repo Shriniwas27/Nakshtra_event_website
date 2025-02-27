@@ -33,8 +33,8 @@ model Event{
   image String?
   admin Admin @relation(fields: [adminId], references: [id])
   adminId Int
-  Registration Registration[]
-  Images Image[]
+  Registration Registration[] 
+  Images Image[] 
   eventEnded Boolean
   createdAt DateTime @default(now())
 }
@@ -48,19 +48,18 @@ model Registration{
   createdAt DateTime @default(now())
   razorpay_payment_id String
   razorpay_order_id String
-  razorpay_signature String
   payment_status String
-  Image Image[]
-  event Event @relation(fields: [eventId], references: [id])
-  user user @relation(fields: [userId], references: [id])
+  Image Image[] 
+  event Event @relation(fields: [eventId], references: [id] , onDelete: Cascade) 
+  user user @relation(fields: [userId], references: [id] , onDelete: Cascade)
 }
 
 model Image{
   id Int @id @default(autoincrement())
   url String
-  event Event @relation(fields: [eventId], references: [id])
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId Int 
-  Registration Registration @relation(fields: [RegistrationId], references: [id])
+  Registration Registration @relation(fields: [RegistrationId], references: [id] , onDelete: Cascade)
   RegistrationId Int
   votes Int @default(0)
   voterecord String[]

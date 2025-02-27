@@ -12,29 +12,28 @@ export const addEvent = async (req, res) => {
     const price = parseInt(req.body.price);
     const adminid = parseInt(req.body.adminId)
 
-    // Validate price
+    
     if (isNaN(price)) {
       return res.status(400).json({ message: "Invalid price format" });
     }
 
-    // Ensure admin exists before creating an event
+
     const admin = await Prisma.admin.findUnique({ where: { id:adminid} });
     if (!admin) {
       return res.status(404).json({ message: "Admin not found" });
     }
 
-    // Handle optional image
+ 
     const image = req.file ? req.file.path : null;
 
-    // Create event in the database
     const event = await Prisma.event.create({
       data: {
         name,
         description,
         price,
-        image, // Supports optional image (NULL if not provided)
-        adminId: adminid, // Ensure adminId is an integer
-        eventEnded: false, // Default event status
+        image,
+        adminId: adminid, 
+        eventEnded: false, 
       },
     });
 
@@ -53,12 +52,14 @@ export const addEvent = async (req, res) => {
 //this controller is used to delete event by id, only admin can delete event
 export const deleteEventById = async (req, res) => {
     try {
-      const { eventId } = req.params;
+      const eventId = parseInt(req.params.id);
+      
       await Prisma.event.delete({
         where: {
           id: eventId,
         },
       });
+
       return res.status(200).json({ message: "Event deleted successfully" });
     } catch (error) {
       return res.status(500).json({ message: "Internal server error" });
@@ -69,13 +70,16 @@ export const deleteEventById = async (req, res) => {
   //this controller is used to update event by id, only admin can update event
 export const updateEventById = async (req, res) => {
     try {
-      const { eventId } = req.params;
+      const eventId = parseInt(req.params.id);
       const validation = addEventSchema.safeParse(req.body);
+      const image = req.file ? req.file.path : null;
       if (!validation.success) {
       return res.status(400)
                 .json({ message: "Invalid data", validation: validation.error });
       }
-      const { name, description, price, image } = validation.data;
+      const { name, description } = req.body;
+      const price = parseInt(req.body.price);
+      
       const event = await Prisma.event.update({
         where: {
           id: eventId,
@@ -179,7 +183,7 @@ export const registerforEvent = async (req, res) => {
         imagecount: 0,
         razorpay_payment_id: "",
         razorpay_order_id: "",
-        razorpay_signature: "",
+
       },
     });
     
@@ -201,7 +205,7 @@ export const registerforEvent = async (req, res) => {
 //this controller is used to prepare leaderboard for event, all user can access leaderboard for event
 export const prepareLeaderBoardforEvent = async (req, res) => {
   try {
-    const { eventId } = req.params;
+    const eventId = parseInt(req.params.id);
     const registrations = await Prisma.image.findMany({
       where: {
         eventId: eventId,
@@ -221,7 +225,7 @@ export const prepareLeaderBoardforEvent = async (req, res) => {
 //this controller is used to get all images for event, all users can get all images for event
 export const getAllImagesforEvent = async(req,res)=>{
 try {
-    const {eventId}=req.params;
+    const eventId = parseInt(req.params.id);
     const images = await Prisma.image.findMany({
         where:{
             eventId:eventId
@@ -238,11 +242,10 @@ try {
 }
 }
 
-
 //this controller is used to get image by id, all users can get image by id
 export const getImageById = async(req,res)=>{
 try {
-    const {imageId}=req.params;
+    const imageId = parseInt(req.params.id);
     const image = await Prisma.image.findUnique({
         where:{
             id:imageId

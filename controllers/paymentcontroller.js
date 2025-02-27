@@ -47,7 +47,6 @@ export const validatePayment = async (req, res) => {
         data: {
           razorpay_payment_id: payment_id,
           razorpay_order_id: order_id,
-          razorpay_signature: signature,
           payment_status: "FAILED",
         },
       });
@@ -71,7 +70,6 @@ export const validatePayment = async (req, res) => {
       data: {
         razorpay_payment_id: payment_id,
         razorpay_order_id: order_id,
-        razorpay_signature: signature,
         payment_status: "PAID",
       },
     });
