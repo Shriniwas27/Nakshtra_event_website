@@ -10,7 +10,7 @@ router.get("/all",auth,getAllEvents);//tested
 router.get("/event/:id",auth,getEventById);///tested
 router.post("/event",upload.single("image"),addEvent);
 router.delete("/event/:id",deleteEventById);//tested
-router.put("/event/:id",updateEventById);
+router.put("/event/:id",updateEventById);//tested
 router.get("/leaderboard/:id",auth,prepareLeaderBoardforEvent);//tested
 router.get("/images",auth,getAllImagesforEvent);  //tested  
 router.get("/image/:id",getImageById);   //tested
